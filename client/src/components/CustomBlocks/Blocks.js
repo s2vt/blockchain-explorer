@@ -17,6 +17,8 @@ const Blocks = () => {
 		});
 	}, []);
 
+	if (!blocks) return <></>;
+
 	return (
 		<>
 			<Title>
