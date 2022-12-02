@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Typography from '@material-ui/core/Typography';
 import { FullscreenExit } from '@material-ui/icons';
 import BlockBar from './BlockBar';
@@ -11,9 +11,11 @@ const Blocks = () => {
 
 	const [blocks, setBlocks] = useState();
 
-	get(url).then(res => {
-		setBlocks(res);
-	});
+	useEffect(() => {
+		get(url).then(res => {
+			setBlocks(res);
+		});
+	}, []);
 
 	return (
 		<>
