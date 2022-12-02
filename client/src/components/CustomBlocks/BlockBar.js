@@ -2,77 +2,25 @@ import React, { useState } from 'react';
 import { KeyboardArrowDown, KeyboardArrowUp } from '@material-ui/icons';
 import styled from 'styled-components';
 import { Divider } from '@material-ui/core';
-
-const expandObj = {
-	status: 200,
-	row: {
-		txhash: 'af1b10424186debd35a46ba40e2423377f97d9c439c292d65de59a9a4f825f8e',
-		validation_code: 'VALID',
-		payload_proposal_hash:
-			'ba9067fe9f7ff7b8398a4e255ecc9286192222bfd97d9f4dd5409b74046c4e57',
-		creator_msp_id: 'YardMSP',
-		endorser_msp_id: '{"GovMSP"}',
-		chaincodename: 'panki-cc',
-		type: 'ENDORSER_TRANSACTION',
-		createdt: '2022-11-29T05:10:07.704Z',
-		read_set: [
-			{
-				chaincode: '_lifecycle',
-				set: [
-					{
-						key: 'namespaces/fields/panki-cc/Sequence',
-						version: {
-							block_num: {
-								low: 7,
-								high: 0,
-								unsigned: true
-							},
-							tx_num: {
-								low: 0,
-								high: 0,
-								unsigned: true
-							}
-						}
-					}
-				]
-			},
-			{
-				chaincode: 'panki-cc',
-				set: []
-			}
-		],
-		write_set: [
-			{
-				chaincode: '_lifecycle',
-				set: []
-			},
-			{
-				chaincode: 'panki-cc',
-				set: [
-					{
-						key: 'ct/100/1552218',
-						is_delete: false,
-						value: '{"coating":"3333","ctgMeasureId":100}'
-					}
-				]
-			}
-		],
-		channelname: 'mychannel'
-	}
-};
+import { get } from '../../services/request';
 
 const BlockBar = ({ block }) => {
 	const [isOpen, setIsOpen] = useState(false);
+	const [data, setData] = useState();
 	const { blocknum, txcount, datahash } = block;
+	const txhash = block.txhash;
+
+	const url = `http://k8s-default-ingress-1e0a9bc43f-2084139913.ap-northeast-2.elb.amazonaws.com/api/transaction/918264e5c4f45f520bb6974ab71fe31a6c9fea70d190b8bbc0b34220c748d857/`;
 
 	const handleToggle = () => {
+		let expandData = [];
+		for (let hash of txhash) {
+			get(url + hash).then(res => expandData.push(res.row.write_set[1].set));
+		}
+		setData(expandData);
 		setIsOpen(prev => !prev);
 	};
 
-	let json = JSON.stringify(expandObj);
-	json = JSON.parse(json);
-
-	const transactions = json.row.write_set[1].set;
 	return (
 		<>
 			<Bar onClick={handleToggle} isOpen={isOpen}>
@@ -99,7 +47,7 @@ const BlockBar = ({ block }) => {
 
 				<TransactionTitle>Transactions</TransactionTitle>
 
-				{transactions.map(data => {
+				{data.map(data => {
 					let { key, value } = data;
 					const type = key.split('/')[0] === 'ct' ? 'ctg' : key.split('/')[0];
 					value = JSON.parse(value);
