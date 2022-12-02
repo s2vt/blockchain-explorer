@@ -55,7 +55,8 @@ const {
 	transactionSelector,
 	transactionListSelector,
 	blockListSearchSelector,
-	transactionListSearchSelector
+	transactionListSearchSelector,
+	customBlockListSelector
 } = tableSelectors;
 
 export const Main = props => {
@@ -240,7 +241,8 @@ const connectedComponent = connect(
 		transactionList: transactionListSelector(state),
 		blockListSearch: blockListSearchSelector(state),
 		transactionListSearch: transactionListSearchSelector(state),
-		blockActivity: blockActivitySelector(state)
+		blockActivity: blockActivitySelector(state),
+		customBlockList: customBlockListSelector(state)
 	}),
 	{
 		getTransaction: tableOperations.transaction,

@@ -5,14 +5,27 @@ import BlockBar from './BlockBar';
 import { Divider } from '@material-ui/core';
 import styled from 'styled-components';
 import { get } from '../../services/request';
+import { getData } from './getCustomBlockList';
+import { connect } from 'react-redux';
 
-const Blocks = () => {
+const Blocks = ({
+	blockList,
+	getTransaction,
+	getBlockListSearch,
+	customBlockListSelector
+}) => {
 	const url = `http://k8s-default-ingress-1e0a9bc43f-2084139913.ap-northeast-2.elb.amazonaws.com/api/blockAndTxList/918264e5c4f45f520bb6974ab71fe31a6c9fea70d190b8bbc0b34220c748d857/0?limit=5`;
-
 	const [blocks, setBlocks] = useState();
-
+	console.log(customBlockListSelector, blockList);
 	useEffect(() => {
 		get(url).then(res => {
+			if (!res) {
+				console.log('res없음');
+			}
+			if (res) {
+				console.log(res);
+				console.log(res.rows);
+			}
 			setBlocks(res);
 		});
 	}, []);
@@ -46,5 +59,10 @@ const Title = styled.div`
 const Content = styled.div`
 	padding: 20px 25px 26px 24px;
 `;
+const dataSelector = state => state;
+
+const connectedComponent = connect(state => ({
+	data: dataSelector(state)
+}))(Blocks);
 
 export default Blocks;
