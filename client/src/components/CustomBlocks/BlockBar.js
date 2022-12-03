@@ -7,17 +7,22 @@ import { get } from '../../services/request';
 const BlockBar = ({ block }) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [data, setData] = useState();
-	const { blocknum, txcount, datahash } = block;
+	const { blocknum, txcount, datahash, prehash, blockhash } = block;
 	const txhash = block.txhash;
 
-	const url = `http://k8s-default-ingress-1e0a9bc43f-2084139913.ap-northeast-2.elb.amazonaws.com/api/transaction/918264e5c4f45f520bb6974ab71fe31a6c9fea70d190b8bbc0b34220c748d857/`;
+	const url = `/api/transaction/918264e5c4f45f520bb6974ab71fe31a6c9fea70d190b8bbc0b34220c748d857/`;
 
-	const handleToggle = () => {
+	const handleToggle = async () => {
 		let expandData = [];
-		for (let hash of txhash) {
-			get(url + hash).then(res => expandData.push(res.row.write_set[1].set));
+		try {
+			for (let hash of txhash) {
+				var res = await get(url + hash);
+				expandData.push(res.row.write_set[1].set[0]);
+			}
+			setData(expandData);
+		} catch (e) {
+			console.log(e);
 		}
-		setData(expandData);
 		setIsOpen(prev => !prev);
 	};
 
@@ -36,43 +41,51 @@ const BlockBar = ({ block }) => {
 			<DropDownContainer isOpen={isOpen}>
 				<HashContainer>
 					<Label gap={56}>
+						<div>Block Hash</div>
+						<Value>{blockhash}</Value>
+					</Label>
+					<Label gap={56}>
 						<div>Data Hash</div>
 						<Value>{datahash}</Value>
 					</Label>
 					<Label gap={56}>
 						<div>Prev Hash</div>
-						<Value>{datahash}</Value>
+						<Value>{prehash}</Value>
 					</Label>
 				</HashContainer>
 
 				<TransactionTitle>Transactions</TransactionTitle>
 
-				{data.map(data => {
-					let { key, value } = data;
-					const type = key.split('/')[0] === 'ct' ? 'ctg' : key.split('/')[0];
-					value = JSON.parse(value);
-					let arr = [];
-					for (let property in value) {
-						arr.push(`${[property]} : ${value[property]}`);
-					}
-					return (
-						<TransactionCard>
-							<Label gap={79}>
-								<div>type</div>
-								<Value>{type}</Value>
-							</Label>
+				{data &&
+					data.map(item => {
+						try {
+							let { key, value } = item;
+							const type = key.split('/')[0] === 'ct' ? 'ctg' : key.split('/')[0];
+							value = JSON.parse(value);
+							return (
+								<TransactionCard>
+									<Label gap={79}>
+										<div>type</div>
+										<Value>{type}</Value>
+									</Label>
 
-							<Label gap={71}>
-								<div>Value</div>
-								<TransactionValueContainer>
-									{arr.map(value => (
-										<Value>{value}</Value>
-									))}
-								</TransactionValueContainer>
-							</Label>
-						</TransactionCard>
-					);
-				})}
+									<Label gap={71}>
+										<div>Value</div>
+										<TransactionValueContainer>
+											{value &&
+												Object.entries(value).map(([key, value], idx) => (
+													<Value key={idx}>
+														{key} : {value}
+													</Value>
+												))}
+										</TransactionValueContainer>
+									</Label>
+								</TransactionCard>
+							);
+						} catch (e) {
+							console.log(e);
+						}
+					})}
 			</DropDownContainer>
 		</>
 	);

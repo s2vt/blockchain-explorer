@@ -14,19 +14,18 @@ const Blocks = ({
 	getBlockListSearch,
 	customBlockListSelector
 }) => {
-	const url = `http://k8s-default-ingress-1e0a9bc43f-2084139913.ap-northeast-2.elb.amazonaws.com/api/blockAndTxList/918264e5c4f45f520bb6974ab71fe31a6c9fea70d190b8bbc0b34220c748d857/0?limit=5`;
+	const url = `/api/blockAndTxList/918264e5c4f45f520bb6974ab71fe31a6c9fea70d190b8bbc0b34220c748d857/0?limit=50`;
 	const [blocks, setBlocks] = useState();
-	console.log(customBlockListSelector, blockList);
 	useEffect(() => {
 		get(url).then(res => {
 			if (!res) {
 				console.log('res없음');
 			}
 			if (res) {
-				console.log(res);
-				console.log(res.rows);
+				// console.log(res);
+				// console.log(res.rows);
+				setBlocks(res.rows);
 			}
-			setBlocks(res);
 		});
 	}, []);
 
@@ -41,9 +40,8 @@ const Blocks = ({
 			<Divider />
 
 			<Content>
-				{blocks.map(block => (
-					<BlockBar key={block.blocknum} block={block} />
-				))}
+				{blocks &&
+					blocks.map(block => <BlockBar key={block.blocknum} block={block} />)}
 			</Content>
 		</>
 	);

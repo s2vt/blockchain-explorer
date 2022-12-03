@@ -1,4 +1,4 @@
-version=0.0.8
+version=0.0.27
 
 aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin 280413110545.dkr.ecr.ap-northeast-2.amazonaws.com
 
