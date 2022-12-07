@@ -22,6 +22,7 @@ export const get = uri =>
 			.set('Accept', 'application/json')
 			.set('Authorization', `bearer ${Auth.getToken()}`)
 			.set('Cache-Control', 'no-cache')
+			.set('Access-Control-Allow-Origin', '*')
 			.end(withPromiseCallback(resolve, reject));
 	});
 export const put = (uri, payload) =>

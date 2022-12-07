@@ -11,8 +11,8 @@ const styles = theme => {
 	const dark = type === 'dark';
 	return {
 		fullwidth: {
-			width: '100%',
-			marginTop: 105
+			width: '100%'
+			// marginTop: 105 ?
 		},
 		display: {
 			display: 'block',
@@ -22,7 +22,9 @@ const styles = theme => {
 		},
 		card: {
 			color: dark ? '#ffffff' : undefined,
-			backgroundColor: dark ? '#453e68' : undefined
+			backgroundColor: dark ? '#453e68' : undefined,
+			overflow: 'auto',
+			height: '80vh'
 		}
 	};
 };
